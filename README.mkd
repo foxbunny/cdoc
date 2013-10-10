@@ -1,0 +1,37 @@
+# CDoc - CoffeeScript documentation extractor
+
+CDoc is a simple NodeJS script that extracts comments from CoffeeScript files
+in the source directory tree, and creates an identical directory tree in the
+target directory that contains markdown comments found in source files.
+
+Other than extracting markdown comments, CDoc doesn't do anything. It does not
+compile HTML, has no templates or CSS. In other words, CDoc is not a
+documetnation generator.
+
+## Installation
+
+Install using npm:
+
+    npm install cdoc
+
+## Basic usage
+
+To extract documentation located in `src` directory, and store extracted files
+in `doc`:
+
+    cdoc src doc
+
+The `doc` directory will contain the same directory structure as `src` and all
+`.coffee` files in the `src` directory will have a matching `.mkd` file in the
+`doc` directory.
+
+## Ignoring directories
+
+To ignore directories, pass the `-i` or `--ignore` option:
+
+    cdoc src doc -i test -i example
+
+## Reporting bugs
+
+Report all bugs to [GitHub issue
+tracker](https://github.com/foxbunny/cdoc/issues).
