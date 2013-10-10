@@ -31,7 +31,10 @@ emptyLineRe = /^\s*$/
 indentedRe = /^ {1,4}\S.*$/
 headingRe = /^(#+) (.*)$/
 
-VERBOSE = true
+## Alias module.exports for brevity
+cdoc = module.exports
+
+cdoc.VERBOSE = VERBOSE = true
 
 # ## Internal functions
 #
@@ -52,7 +55,7 @@ VERBOSE = true
 #
 # The content is an array of lines as found in the source code without any
 # wrapping applied.
-extract = (filename) ->
+cdoc.extract = extract = (filename) ->
   contents = readFileSync filename, encoding: 'utf-8'
 
   isComment = (line) ->
@@ -131,7 +134,7 @@ extract = (filename) ->
 # All normal paragraphs (of type 'normal') are wrapped at 79 characters.
 #
 # All indented paragraphs are joined with newlines and otherwise left intact.
-processParagraph = ({type, content}) ->
+cdoc.processParagraph = processParagraph = ({type, content}) ->
   switch type
     when 'heading'
       s = content.join ' '
@@ -148,7 +151,7 @@ processParagraph = ({type, content}) ->
 #
 # Applies the `processParagraph()` function to all paragraph objects extracted
 # by the `extract()` function.
-processParagraphs = (paragraphs) ->
+cdoc.processParagraphs = processParagraphs = (paragraphs) ->
   (processParagraph p for p in paragraphs).join('\n\n')
 
 # ### `tocIndent(level)`
@@ -191,7 +194,7 @@ buildToc = (paragraphs) ->
 # ### `processFile(filename)`
 #
 # Performs conversion of source code in `filename` to Markdown.
-processFile = (filename) ->
+cdoc.procesFile = processFile = (filename) ->
   paragraphs = extract filename
   mkd = processParagraphs paragraphs
   if mkd.indexOf('::TOC::') > -1
@@ -202,27 +205,27 @@ processFile = (filename) ->
 #
 # Wrapper around `console.log()` which suppresses output if `VERBOSE` flag is
 # unset.
-log = (msg) ->
+cdoc.log = log = (msg) ->
   console.log(msg) if VERBOSE
 
 # ### `isDir(path)`
 #
 # Returns `true` if `path` is a directory.
-isDir = (path) ->
+cdoc.isDir = isDir = (path) ->
   statSync(path).isDirectory()
 
 # ### `isGlob(s)`
 #
 # Returns `true` if string `is` contains glob pattern characters ('\*' and
 # '?').
-isGlob = (s) ->
+cdoc.isGlob = isGlob = (s) ->
   s.indexOf('*') > -1 or s.indexOf('?') > -1
 
 # ### `matchGlob(s, glob)`
 #
 # Converts the glob pattern string `glob` to RegExp and returns a match against
 # the string `s`. Return value is the same as for `String.prototype.match()`.
-matchGlob = (s, glob) ->
+cdoc.matchGlob = matchGlob = (s, glob) ->
   glob = glob.
     replace('*', '.*').
     replace('?', '.').
@@ -233,7 +236,7 @@ matchGlob = (s, glob) ->
 #
 # Returns true if `filename` matches at least one item in the `skipList` array.
 # The `skipList` items can either be exact filenames or glob patterns.
-isSkippable = (filename, skipList) ->
+cdoc.isSkippable = isSkippable = (filename, skipList) ->
   for skip in skipList
     if isGlob skip
       t = matchGlob filename, skip
@@ -250,7 +253,7 @@ isSkippable = (filename, skipList) ->
 # The `target` directory tree will be created to match the source directory
 # tree. The target filenames will be the same as source filenames except for
 # the 'mkd' extension.
-processDir = (dir, target, skip=[]) ->
+cdoc.processDir = processDir = (dir, target, skip=[]) ->
   index = readdirSync dir
 
   ## Ensure target directory exists
@@ -283,49 +286,4 @@ processDir = (dir, target, skip=[]) ->
       writeFileSync targetPath, mkd, encoding: 'utf-8'
 
   return
-
-# ## Command line usage
-#
-# To get command line usage information, run this script with -h command.
-#
-# ### Basic usage
-#
-#     cdoc SOURCE_DIR DOCS_DIR
-#
-# ### Ignoring directories
-#
-#     cdoc SOURCE_DIR DOCS_DIR -i IGNORED [-i IGNORED ...]
-#
-opts = opts.usage([
-  'Usage:'
-  '    $0 [-q] [-i IGNORE ...] SOURCE_DIR DOCS_DIR'
-  '    $0 [-h]'
-  ''
-].join('\n')).
-  alias('i', 'ignore').
-  alias('q', 'quiet').
-  alias('h', 'help').
-  describe('i', 'Ignore IGNORE directory. This option can be '
-    'specified multiple times and can include glob patterns.').
-  describe('q', 'Do not log messages to STDOUT').
-  describe('h', 'Show this help')
-
-if opts.argv.h
-  console.log opts.help()
-  process.exit 0
-
-sourceDir = opts.argv._[0]
-targetDir = opts.argv._[1]
-
-if not sourceDir? or not targetDir?
-  console.log "You must specify source and target directories"
-  console.log()
-  console.log opts.help()
-  process.exit 1
-
-if opts.argv.q
-  VERBOSE = false
-
-processDir sourceDir, targetDir, toArray opts.argv.i
-
 

@@ -12,8 +12,10 @@
     "type": "MIT",
     "url": "https://github.com/foxbunny/cdoc/"
   },
+  "bin": {
+    "cdoc": "./bin/cli.js"
+  },
   "main": "lib/cdoc.js",
-  "bin": "lib/cdoc.js",
   "dependencies" : {
     "dahelpers": "*",
     "optimist": "*"
@@ -21,5 +23,5 @@
   "devDependencies": {
     "coffee-script": "1.6.3"
   },
-  "version" : "0.0.1"
+  "version" : "0.0.2"
 }
