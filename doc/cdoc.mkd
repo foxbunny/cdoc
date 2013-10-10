@@ -1,0 +1,144 @@
+
+# <a id="cdoc-coffeescript-documentation-extractor">CDoc - CoffeeScript documentation extractor</a>
+
+CDoc is a simple NodeJS script that extracts comments from CoffeeScript files
+in the source directory tree, and creates an identical directory tree in the
+target directory that contains markdown comments found in source files.
+
+Other than extracting markdown comments, CDoc doesn't do anything. It does not
+compile HTML, has no templates or CSS. In other words, CDoc is not a
+documetnation generator.
+
+ * [Dependencies](#dependencies)
+ * [Internal functions](#internal-functions)
+   * [`extract(filename)`](#extract-filename)
+   * [`processParagraph(o)`](#processparagraph-o)
+   * [`processParagraphs(paragraphs)`](#processparagraphs-paragraphs)
+   * [`tocIndent(level)`](#tocindent-level)
+   * [`buildToc(paragraphs)`](#buildtoc-paragraphs)
+   * [`processFile(filename)`](#processfile-filename)
+   * [`log(msg)`](#log-msg)
+   * [`isDir(path)`](#isdir-path)
+   * [`isGlob(s)`](#isglob-s)
+   * [`matchGlob(s, glob)`](#matchglob-s-glob)
+   * [`isSkippable(filename, skipList)`](#isskippable-filename-skiplist)
+   * [`processDir(dir, target, [skip])`](#processdir-dir-target-skip)
+ * [Command line usage](#command-line-usage)
+   * [Basic usage](#basic-usage)
+   * [Ignoring directories](#ignoring-directories)
+
+
+
+## <a id="dependencies">Dependencies</a>
+
+CDoc depends on [DaHelpers](https://github.com/foxbunny/dahelpers) and
+[node-optimist](https://github.com/substack/node-optimist).
+
+
+## <a id="internal-functions">Internal functions</a>
+
+The functions documented below are internal functions that are not accessible
+otherwise.
+
+
+### <a id="extract-filename">`extract(filename)`</a>
+
+Internal function.
+
+The return value is an array of paragraphs. Each paragraph is rerpresented by
+an object containing `type` and `content` keys. The `type` key can be one of
+the following:
+
+ + 'heading'
+ + 'code'
+ + 'normal'
+
+The content is an array of lines as found in the source code without any
+wrapping applied.
+
+
+### <a id="processparagraph-o">`processParagraph(o)`</a>
+
+Processes the single paragraph object.
+
+All paragraphs of type 'heading' are decorated with an anchor so as to make
+them accessible for bookmarking and table of contents.
+
+All normal paragraphs (of type 'normal') are wrapped at 79 characters.
+
+All indented paragraphs are joined with newlines and otherwise left intact.
+
+
+### <a id="processparagraphs-paragraphs">`processParagraphs(paragraphs)`</a>
+
+Applies the `processParagraph()` function to all paragraph objects extracted by
+the `extract()` function.
+
+
+### <a id="tocindent-level">`tocIndent(level)`</a>
+
+Returns the number of spaces required for TOC indentation for a given `level`.
+
+
+### <a id="buildtoc-paragraphs">`buildToc(paragraphs)`</a>
+
+Builds the table of contents from given paragraphs. Returns a string of
+Markdown-formatted table of contents.
+
+
+### <a id="processfile-filename">`processFile(filename)`</a>
+
+Performs conversion of source code in `filename` to Markdown.
+
+
+### <a id="log-msg">`log(msg)`</a>
+
+Wrapper around `console.log()` which suppresses output if `VERBOSE` flag is
+unset.
+
+
+### <a id="isdir-path">`isDir(path)`</a>
+
+Returns `true` if `path` is a directory.
+
+
+### <a id="isglob-s">`isGlob(s)`</a>
+
+Returns `true` if string `is` contains glob pattern characters ('\*' and '?').
+
+
+### <a id="matchglob-s-glob">`matchGlob(s, glob)`</a>
+
+Converts the glob pattern string `glob` to RegExp and returns a match against
+the string `s`. Return value is the same as for `String.prototype.match()`.
+
+
+### <a id="isskippable-filename-skiplist">`isSkippable(filename, skipList)`</a>
+
+Returns true if `filename` matches at least one item in the `skipList` array.
+The `skipList` items can either be exact filenames or glob patterns.
+
+
+### <a id="processdir-dir-target-skip">`processDir(dir, target, [skip])`</a>
+
+Recursively processes the `dir` directory and creates extracted Markdown files
+in the `target` directory.
+
+The `target` directory tree will be created to match the source directory tree.
+The target filenames will be the same as source filenames except for the 'mkd'
+extension.
+
+
+## <a id="command-line-usage">Command line usage</a>
+
+To get command line usage information, run this script with -h command.
+
+
+### <a id="basic-usage">Basic usage</a>
+
+    cdoc SOURCE_DIR DOCS_DIR
+
+
+### <a id="ignoring-directories">Ignoring directories</a>
+
+    cdoc SOURCE_DIR DOCS_DIR -i IGNORED [-i IGNORED ...]

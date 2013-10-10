@@ -1,0 +1,24 @@
+{
+  "name" : "cdoc",
+  "description" : "Simple stupid CoffeeScript documentation extractor",
+  "homepage" : "https://github.com/foxbunny/cdoc/",
+  "keywords" : ["documentation", "coffeescript", "comments", "markdown"],
+  "author" : "Branko Vukelic <branko@brankovukelic.com>",
+  "bugs": {
+    "url": "https://github.com/foxbunny/cdoc/issues",
+    "email": "branko@brankovukelic.com"
+  },
+  "license": {
+    "type": "MIT",
+    "url": "https://github.com/foxbunny/cdoc/"
+  },
+  "dependencies" : {
+    "dahelpers": "*",
+    "optimist": "*"
+  },
+  "devDependencies": {
+    "coffee-script": "1.6.3"
+  },
+  "main": "main.js",
+  "version" : "0.5.2"
+}
