@@ -1,0 +1,12 @@
+# Changelog
+
+## 0.0.3
+
+### Ported to LiveScript
+
+The entire code base has been ported to LiveScript and `.ls` extension was
+added to the list of extensions that will be parsed by CDoc.
+
+### Switched to GNU make
+
+The project is now using GNU make in favor of `volo`.
