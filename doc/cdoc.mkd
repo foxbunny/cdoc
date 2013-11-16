@@ -1,9 +1,10 @@
 
-# <a id="cdoc-coffeescript-documentation-extractor">CDoc - CoffeeScript documentation extractor</a>
+# <a id="cdoc-coffeescript-livescript-documentation-extractor">CDoc - CoffeeScript/LiveScript documentation extractor</a>
 
-CDoc is a simple NodeJS script that extracts comments from CoffeeScript files
-in the source directory tree, and creates an identical directory tree in the
-target directory that contains markdown comments found in source files.
+CDoc is a simple NodeJS script that extracts comments from CoffeeScript or
+LiveScript files in the source directory tree, and creates an identical
+directory tree in the target directory that contains markdown comments found in
+source files.
 
 Other than extracting markdown comments, CDoc doesn't do anything. It does not
 compile HTML, has no templates or CSS. In other words, CDoc is not a
@@ -11,6 +12,8 @@ documetnation generator.
 
  * [Dependencies](#dependencies)
  * [Internal functions](#internal-functions)
+   * [`isComment(line)`](#iscomment-line)
+   * [`lineType(line)`](#linetype-line)
    * [`extract(filename)`](#extract-filename)
    * [`processParagraph(o)`](#processparagraph-o)
    * [`processParagraphs(paragraphs)`](#processparagraphs-paragraphs)
@@ -23,9 +26,6 @@ documetnation generator.
    * [`matchGlob(s, glob)`](#matchglob-s-glob)
    * [`isSkippable(filename, skipList)`](#isskippable-filename-skiplist)
    * [`processDir(dir, target, [skip])`](#processdir-dir-target-skip)
- * [Command line usage](#command-line-usage)
-   * [Basic usage](#basic-usage)
-   * [Ignoring directories](#ignoring-directories)
 
 
 
@@ -37,8 +37,30 @@ CDoc depends on [DaHelpers](https://github.com/foxbunny/dahelpers) and
 
 ## <a id="internal-functions">Internal functions</a>
 
-The functions documented below are internal functions that are not accessible
-otherwise.
+This module implements the methods used for parsing and extracting the Markdown
+sources from the source code. The command line interface is implemented in the
+`bin/cli.js` script, which is what users run when they want to use CDoc from
+command line.
+
+
+### <a id="iscomment-line">`isComment(line)`</a>
+
+Matches the unprocessed source file line against regexp and returns the match
+if the line is a comment.
+
+
+### <a id="linetype-line">`lineType(line)`</a>
+
+Returns the type of the processed source file line. Output is a an array with
+two members. The first memeber is either the unmodified input, a `null`, or a
+newline character, depending on the type of line. The second member is the type
+of the line.
+
+ + `[null, 'source']`: source code
+ + `['\n', 'empty']`: empty line
+ + `[line, 'heading`']`: heading comment block
+ + `[line, 'indented']`: indented comment block
+ + `[line, 'normal']`: normal comment block
 
 
 ### <a id="extract-filename">`extract(filename)`</a>
@@ -49,8 +71,10 @@ The return value is an array of paragraphs. Each paragraph is rerpresented by
 an object containing `type` and `content` keys. The `type` key can be one of
 the following:
 
+ + 'source'
+ + 'empty'
  + 'heading'
- + 'code'
+ + 'indented'
  + 'normal'
 
 The content is an array of lines as found in the source code without any
@@ -61,10 +85,10 @@ wrapping applied.
 
 Processes the single paragraph object.
 
-All paragraphs of type 'heading' are decorated with an anchor so as to make
-them accessible for bookmarking and table of contents.
+All paragraphs of type \heading are decorated with an anchor so as to make them
+accessible for bookmarking and table of contents.
 
-All normal paragraphs (of type 'normal') are wrapped at 79 characters.
+All normal paragraphs (of type \normal) are wrapped at 79 characters.
 
 All indented paragraphs are joined with newlines and otherwise left intact.
 
@@ -127,18 +151,3 @@ in the `target` directory.
 The `target` directory tree will be created to match the source directory tree.
 The target filenames will be the same as source filenames except for the 'mkd'
 extension.
-
-
-## <a id="command-line-usage">Command line usage</a>
-
-To get command line usage information, run this script with -h command.
-
-
-### <a id="basic-usage">Basic usage</a>
-
-    cdoc SOURCE_DIR DOCS_DIR
-
-
-### <a id="ignoring-directories">Ignoring directories</a>
-
-    cdoc SOURCE_DIR DOCS_DIR -i IGNORED [-i IGNORED ...]

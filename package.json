@@ -21,7 +21,7 @@
     "optimist": "*"
   },
   "devDependencies": {
-    "coffee-script": "1.6.3"
+    "LiveScript": ">=1.2.0"
   },
   "version" : "0.0.2"
 }
